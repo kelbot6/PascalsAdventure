@@ -287,14 +287,14 @@ int main() {
         //*bg0_y_scroll = yscroll / 2;
 
 		//*bg1_x_scroll = xscroll;
-		*bg1_y_scroll = yscroll;
+		*bg1_y_scroll = 350 + yscroll;
 
 		xscroll--;
 		*bg2_x_scroll = xscroll / 20;
 		*bg2_y_scroll = yscroll / 2;
 
 		//*bg3_x_scroll = xscroll;
-		*bg3_y_scroll = yscroll / 4;
+		*bg3_y_scroll = 355 + yscroll / 4;
 
         /* delay some */
         delay(50);
