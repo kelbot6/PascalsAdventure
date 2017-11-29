@@ -528,14 +528,14 @@ struct Thing {
 /* initialize Pascal */
 void pascal_init(struct Thing* pascal) {
 
-	pascal->x = 120;
+	pascal->x = 128;
 	pascal->y = 130;
 	pascal->border = 40;
 	pascal->frame = 16;
 	pascal->move = 0;
 	pascal->counter = 0;
 	pascal->animation_delay = 8;
-	pascal->sprite = sprite_init(pascal->x, pascal->y, SIZE_8_8, 0, 0, pascal->frame, 1);
+	pascal->sprite = sprite_init(pascal->x, pascal->y, SIZE_8_8, 0, 0, pascal->frame, 0);
 }
 
 /* stop */
@@ -569,47 +569,47 @@ void pascal_update(struct Thing* pascal) {
 }
 
 /*****************************************************************************************/
-/* initialize Rapunzel */
-void rapunzel_init(struct Thing* rapunzel) {
+/* initialize Bird */
+void bird_init(struct Thing* bird) {
 
-    rapunzel->x = 120;
-    rapunzel->y = 90;
-    rapunzel->border = 40;
-    rapunzel->frame = 0;
-    rapunzel->move = 0;
-    rapunzel->counter = 0;
-    rapunzel->animation_delay = 8;
-    rapunzel->sprite = sprite_init(rapunzel->x, rapunzel->y, SIZE_16_16, 0, 0, rapunzel->frame, 1);
+    bird->x = 120;
+    bird->y = 90;
+    bird->border = 40;
+    bird->frame = 14;
+    bird->move = 0;
+    bird->counter = 0;
+    bird->animation_delay = 8;
+    bird->sprite = sprite_init(bird->x, bird->y, SIZE_8_8, 0, 0, bird->frame, 0);
 }
 
 /* stop */
-void rapunzel_stop(struct Thing* rapunzel) {
+void bird_stop(struct Thing* bird) {
 
-    rapunzel->move = 0;
-    rapunzel->frame = 0;
-    rapunzel->counter = 7;
-    sprite_set_offset(rapunzel->sprite, rapunzel->frame);
+    bird->move = 0;
+    bird->frame = 14;
+    bird->counter = 7;
+    sprite_set_offset(bird->sprite, bird->frame);
 }
 
 /* update the thing */
-void rapunzel_update(struct Thing* rapunzel) {
+void bird_update(struct Thing* bird) {
 
-    if(rapunzel->move) {
+    if(bird->move) {
 
-        rapunzel->counter++;
-        if(rapunzel->counter >= rapunzel->animation_delay) {
+        bird->counter++;
+        if(bird->counter >= bird->animation_delay) {
 
-            //rapunzel->frame = rapunzel->frame - 4;
-            //if(rapunzel->frame < 12) {
+            //bird->frame = bird->frame - 4;
+            //if(bird->frame < 12) {
 
-                //rapunzel->frame = 0;
+                //bird->frame = 0;
             //}
-            sprite_set_offset(rapunzel->sprite, rapunzel->frame);
-            rapunzel->counter = 0;
+            sprite_set_offset(bird->sprite, bird->frame);
+            bird->counter = 0;
 
         }
     }
-    sprite_position(rapunzel->sprite, rapunzel->x, rapunzel->y);
+    sprite_position(bird->sprite, bird->x, bird->y);
 }
 
 /* the main function */
@@ -630,9 +630,9 @@ int main() {
 	struct Thing pascal;
 	pascal_init(&pascal);
 
-	/* create Rapunzel */
-	struct Thing rapunzel;
-	rapunzel_init(&rapunzel);
+	/* create Bird */
+	struct Thing bird;
+	bird_init(&bird);
 
     /* set initial scroll to 0 */
     int xscroll = 0;
@@ -643,7 +643,7 @@ int main() {
 
 		/* update pascal */
 		pascal_update(&pascal);
-		rapunzel_update(&rapunzel);
+		bird_update(&bird);
 
         /* scroll with the arrow keys */
         if (button_pressed(BUTTON_DOWN)) {
@@ -662,7 +662,7 @@ int main() {
 		else {
 
 			pascal_stop(&pascal);
-			rapunzel_stop(&rapunzel);
+			bird_stop(&bird);
 		}
 
         /* wait for vblank before scrolling */
@@ -675,7 +675,7 @@ int main() {
 
 		xscroll--;
 		*bg2_x_scroll = xscroll / 20;
-		*bg2_y_scroll = yscroll / 2;
+		*bg2_y_scroll = (yscroll / 2) - 200;
 
 		//*bg3_x_scroll = xscroll;
 		*bg3_y_scroll = 355 + yscroll / 4;
