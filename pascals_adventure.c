@@ -480,11 +480,12 @@ struct Thing {
     int border;
 };
 
+/***************************************************************************************/
 /* initialize Pascal */
 void pascal_init(struct Thing* pascal) {
 
 	pascal->x = 120;
-	pascal->y = 150;
+	pascal->y = 130;
 	pascal->border = 40;
 	pascal->frame = 16;
 	pascal->move = 0;
@@ -521,7 +522,50 @@ void pascal_update(struct Thing* pascal) {
 		}
 	}
 	sprite_position(pascal->sprite, pascal->x, pascal->y);
+}
 
+/*****************************************************************************************/
+/* initialize Rapunzel */
+void rapunzel_init(struct Thing* rapunzel) {
+
+    rapunzel->x = 120;
+    rapunzel->y = 90;
+    rapunzel->border = 40;
+    rapunzel->frame = 0;
+    rapunzel->move = 0;
+    rapunzel->counter = 0;
+    rapunzel->animation_delay = 8;
+    rapunzel->sprite = sprite_init(rapunzel->x, rapunzel->y, SIZE_16_16, 0, 0, rapunzel->frame, 1);
+}
+
+/* stop */
+void rapunzel_stop(struct Thing* rapunzel) {
+
+    rapunzel->move = 0;
+    rapunzel->frame = 0;
+    rapunzel->counter = 7;
+    sprite_set_offset(rapunzel->sprite, rapunzel->frame);
+}
+
+/* update the thing */
+void rapunzel_update(struct Thing* rapunzel) {
+
+    if(rapunzel->move) {
+
+        rapunzel->counter++;
+        if(rapunzel->counter >= rapunzel->animation_delay) {
+
+            //rapunzel->frame = rapunzel->frame - 4;
+            //if(rapunzel->frame < 12) {
+
+                //rapunzel->frame = 0;
+            //}
+            sprite_set_offset(rapunzel->sprite, rapunzel->frame);
+            rapunzel->counter = 0;
+
+        }
+    }
+    sprite_position(rapunzel->sprite, rapunzel->x, rapunzel->y);
 }
 
 /* the main function */
@@ -542,6 +586,10 @@ int main() {
 	struct Thing pascal;
 	pascal_init(&pascal);
 
+	/* create Rapunzel */
+	struct Thing rapunzel;
+	rapunzel_init(&rapunzel);
+
     /* set initial scroll to 0 */
     int xscroll = 0;
     int yscroll = 0;
@@ -551,6 +599,7 @@ int main() {
 
 		/* update pascal */
 		pascal_update(&pascal);
+		rapunzel_update(&rapunzel);
 
         /* scroll with the arrow keys */
         if (button_pressed(BUTTON_DOWN)) {
@@ -569,6 +618,7 @@ int main() {
 		else {
 
 			pascal_stop(&pascal);
+			rapunzel_stop(&rapunzel);
 		}
 
         /* wait for vblank before scrolling */
