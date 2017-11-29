@@ -8,6 +8,7 @@
 #include "sprite_sheet.h"
 
 /* include the tile maps we are using */
+#include "background1.h"
 #include "background2.h"
 #include "background3.h"
 #include "background4.h"
@@ -156,10 +157,53 @@ void setup_background() {
         bg_palette[i] = tower_tiles_palette[i];
     }
 
-	//*******************************************************
+    //*******************************************************
     /* load the image into char block 0 (16 bits at a time) */
     volatile unsigned short* dest = char_block(0);
     unsigned short* image = (unsigned short*) tower_tiles_data;
+    for (int i = 0; i < ((tower_tiles_width * tower_tiles_height) / 2); i++) {
+        dest[i] = image[i];
+    }
+
+    /* set all control the bits in this register */
+    *bg0_control = 0 |    /* priority, 0 is highest, 3 is lowest */
+        (0 << 2)  |       /* the char block the image data is stored in */
+        (0 << 6)  |       /* the mosaic flag */
+        (1 << 7)  |       /* color mode, 0 is 16 colors, 1 is 256 colors */
+        (28 << 8) |       /* the screen block the tile data is stored in */
+        (0 << 13) |       /* wrapping flag */
+        (3 << 14);        /* bg size, 0 is 256x256 */
+
+    /* load the tile data into screen block 16 through 19 */
+    dest = screen_block(28);
+    for (int i = 0; i < 32; i++) {
+        for (int j = 0; j < 32; j++) {
+            dest[i*32 + j] = background1[i*64 + j];
+        }
+    }   
+    dest = screen_block(29);
+    for (int i = 0; i < 32; i++) {
+        for (int j = 0; j < 32; j++) {
+            dest[i*32 + j] = background1[i*64+32 + j];
+        }
+    }   
+    dest = screen_block(30); 
+    for (int i = 0; i < 32; i++) {
+        for (int j = 0; j < 32; j++) {
+            dest[i*32 + j] = background1[i*64 + j + 2048];
+        }
+    }
+    dest = screen_block(31); 
+    for (int i = 0; i < 32; i++) {
+        for (int j = 0; j < 32; j++) {
+            dest[i*32 + j] = background1[i*64+32 + j + 2048];
+        }
+    }
+
+	//*******************************************************
+    /* load the image into char block 0 (16 bits at a time) */
+    dest = char_block(0);
+    image = (unsigned short*) tower_tiles_data;
     for (int i = 0; i < ((tower_tiles_width * tower_tiles_height) / 2); i++) {
         dest[i] = image[i];
     }
@@ -571,7 +615,7 @@ void rapunzel_update(struct Thing* rapunzel) {
 /* the main function */
 int main() {
     /* we set the mode to mode 0 with bg0 on */
-    *display_control = MODE0 | BG1_ENABLE | BG2_ENABLE | BG3_ENABLE | SPRITE_ENABLE | SPRITE_MAP_1D;
+    *display_control = MODE0 | BG0_ENABLE | BG1_ENABLE | BG2_ENABLE | BG3_ENABLE | SPRITE_ENABLE | SPRITE_MAP_1D;
 
     /* setup the background 0 */
     setup_background();
@@ -623,8 +667,8 @@ int main() {
 
         /* wait for vblank before scrolling */
         wait_vblank();
-        //*bg0_x_scroll = xscroll / 2;
-        //*bg0_y_scroll = yscroll / 2;
+        //*bg0_x_scroll = xscroll;
+        *bg0_y_scroll = 350 + yscroll;
 
 		//*bg1_x_scroll = xscroll;
 		*bg1_y_scroll = 350 + yscroll;
