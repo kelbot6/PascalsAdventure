@@ -594,10 +594,10 @@ void pascal_update(struct Thing* pascal) {
 
 /*****************************************************************************************/
 /* initialize Bird */
-void bird_init(struct Thing* bird, struct Thing* pascal) {
+void bird_init(struct Thing* bird) {
 
     bird->x = 8;
-    bird->y = pascal->y;
+    bird->y = 80;
     bird->border = 40;
     bird->frame = 14;
     bird->move = 1;
@@ -623,17 +623,42 @@ void bird_update(struct Thing* bird, struct Thing* pascal, int birdVelocity, int
 
     if(bird->move) {
 
-		bird->y = pascal->y;
+		//bird->y = pascal->y;
 
 		if(birdVelocity > 0 && *birdCounter >= birdDelay) {
 
-			bird->x+=.25;
+			if(bird->x < pascal->x) {
+
+				bird->y = bird->y + 0.20;
+			}
+			else if(bird->x > pascal->x) {
+
+				bird->y = bird->y - 0.20;
+			}
+
+			sprite_set_horizontal_flip(bird->sprite, 0);
+			bird->x+=.50;
 			birdCounter = 0;
 		}
 		else if(birdVelocity < 0 && *birdCounter >= birdDelay) {
 
-			bird->x-=.25;
+            if(bird->x > pascal->x) {
+
+                bird->y = bird->y + 0.20;
+            }
+            else if(bird->x < pascal->x) {
+
+                bird->y = bird->y - 0.20;
+            }
+
+			sprite_set_horizontal_flip(bird->sprite, 1);
+			bird->x-=.50;
 			birdCounter = 0;
+		}
+
+		if(pascal->move == 1 && !(pascal->y <= 80)) {
+
+			bird->y = bird->y - 1.00;
 		}
 
 		//frames 14, 18, 22
@@ -658,7 +683,7 @@ void bird_update(struct Thing* bird, struct Thing* pascal, int birdVelocity, int
 void pan_init(struct Thing* pan) {
 
     pan->x = 128;
-    pan->y = 100;
+    pan->y = 0;
     pan->border = 40;
     pan->frame = 24;
     pan->move = 1;
@@ -693,11 +718,11 @@ void pan_update(struct Thing* pan, struct Thing* pascal) {
             pan->counter = 0;
 			if(pascal->move == 1) {
 
-				pan->y+=4;
+				pan->y+=12;
 			}
 			else {
 
-				pan->y+=2;
+				pan->y+=6;
 			}
 			if(pan->y + 8 >= HEIGHT) {
 
@@ -722,13 +747,9 @@ int main() {
     /* clear all the sprites on screen now */
     sprite_clear();
 
-	/* create pascal */
-	struct Thing pascal;
-	pascal_init(&pascal);
-
 	/* create Bird */
 	struct Thing bird;
-	bird_init(&bird, &pascal);
+	bird_init(&bird);
 	//Give the bird an initial velocity and delay counter
 	int birdVelocity = 1;
 	int birdCounter = 0;
@@ -737,6 +758,10 @@ int main() {
 	struct Thing pan;
 	pan_init(&pan);
 
+    /* create pascal */
+    struct Thing pascal;
+    pascal_init(&pascal);
+
     /* set initial scroll to 0 */
     int xscroll = 0;
     int yscroll = 0;
@@ -744,7 +769,7 @@ int main() {
     /* loop forever */
     while (1) {
 
-		if(bird.x >= WIDTH) {
+		if(bird.x >= WIDTH - 8) {
 
 			birdVelocity = -1;
 		}
