@@ -733,6 +733,30 @@ void pan_update(struct Thing* pan, struct Thing* pascal) {
     sprite_position(pan->sprite, pan->x, pan->y);
 }
 
+/* Check for collision */
+int collision(struct Thing* pascal, struct Thing* pan, struct Thing* bird, int birdVelocity) {
+
+	if(pascal->move != 2) {
+
+		/* did pascal and pan collide */
+		if(pan->y + 8 > pascal->y && pan->y + 8 <  pascal->y + 8) {
+
+			return 1;
+		}
+		/* did pascal and pan collide */
+		else if(birdVelocity > 0 && pascal->x == bird->x + 8) {
+
+			return 1;
+		}
+		else if(birdVelocity < 0 && pascal->x + 8 == bird->x) {
+
+			return 1;
+		}
+	}
+	return 0;
+
+}
+
 /* the main function */
 int main() {
     /* we set the mode to mode 0 with bg0 on */
@@ -769,6 +793,16 @@ int main() {
     /* loop forever */
     while (1) {
 
+		if(yscroll <= -300) {
+
+			break;
+		}
+
+		if(collision(&pascal, &pan, &bird, birdVelocity) == 1) {
+
+			break;
+		}
+
 		if(bird.x >= WIDTH - 8) {
 
 			birdVelocity = -1;
@@ -785,7 +819,7 @@ int main() {
 
         /* scroll with the arrow keys */
         if (button_pressed(BUTTON_DOWN)) {
-            yscroll++;
+            //yscroll++;
         }
         else if (button_pressed(BUTTON_UP) && pascal.move != 2) {
 
