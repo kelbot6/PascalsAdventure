@@ -506,7 +506,7 @@ struct Thing {
     struct Sprite* sprite;
 
     /* the x and y postion */
-    int x, y;
+    float x, y;
 
     /* which frame of the animation he is on */
     int frame;
@@ -618,8 +618,8 @@ void bird_stop(struct Thing* bird) {
 /* update the thing */
 void bird_update(struct Thing* bird, struct Thing* pascal, int birdVelocity, int* birdCounter) {
 
-	int birdDelay = 9999999;
-	birdCounter++;
+	int birdDelay = 50;
+	*birdCounter++;
 
     if(bird->move) {
 
@@ -627,12 +627,12 @@ void bird_update(struct Thing* bird, struct Thing* pascal, int birdVelocity, int
 
 		if(birdVelocity > 0 && *birdCounter >= birdDelay) {
 
-			bird->x+=1;
+			bird->x+=.25;
 			birdCounter = 0;
 		}
 		else if(birdVelocity < 0 && *birdCounter >= birdDelay) {
 
-			bird->x-=1;
+			bird->x-=.25;
 			birdCounter = 0;
 		}
 
