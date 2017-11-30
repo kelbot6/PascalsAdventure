@@ -534,7 +534,7 @@ void pascal_init(struct Thing* pascal) {
 	pascal->frame = 16;
 	pascal->move = 0;
 	pascal->counter = 0;
-	pascal->animation_delay = 8;
+	pascal->animation_delay = 16;
 	pascal->sprite = sprite_init(pascal->x, pascal->y, SIZE_8_8, 0, 0, pascal->frame, 0);
 }
 
@@ -602,7 +602,7 @@ void bird_init(struct Thing* bird) {
     bird->frame = 14;
     bird->move = 0;
     bird->counter = 0;
-    bird->animation_delay = 8;
+    bird->animation_delay = 16;
     bird->sprite = sprite_init(bird->x, bird->y, SIZE_8_8, 0, 0, bird->frame, 0);
 }
 
@@ -644,9 +644,9 @@ void pan_init(struct Thing* pan) {
     pan->y = 100;
     pan->border = 40;
     pan->frame = 24;
-    pan->move = 0;
+    pan->move = 1;
     pan->counter = 0;
-    pan->animation_delay = 8;
+    pan->animation_delay = 16;
     pan->sprite = sprite_init(pan->x, pan->y, SIZE_8_8, 0, 0, pan->frame, 0);
 }
 
@@ -660,21 +660,32 @@ void pan_stop(struct Thing* pan) {
 }
 
 /* update the thing */
-void pan_update(struct Thing* pan) {
+void pan_update(struct Thing* pan, struct Thing* pascal) {
 
     if(pan->move) {
 
         pan->counter++;
         if(pan->counter >= pan->animation_delay) {
 
-            //pan->frame = pan->frame - 4;
-            //if(pan->frame < 12) {
+            pan->frame = pan->frame + 2;
+            if(pan->frame > 26) {
 
-                //pan->frame = 0;
-            //}
+                pan->frame = 24;
+            }
             sprite_set_offset(pan->sprite, pan->frame);
             pan->counter = 0;
+			if(pascal->move == 1) {
 
+				pan->y+=4;
+			}
+			else {
+
+				pan->y+=2;
+			}
+			if(pan->y + 8 >= HEIGHT) {
+
+				pan->y = 0;
+			}
         }
     }
     sprite_position(pan->sprite, pan->x, pan->y);
@@ -716,7 +727,7 @@ int main() {
 		/* update pascal */
 		pascal_update(&pascal);
 		bird_update(&bird);
-		pan_update(&pan);
+		pan_update(&pan, &pascal);
 
         /* scroll with the arrow keys */
         if (button_pressed(BUTTON_DOWN)) {
@@ -744,7 +755,7 @@ int main() {
 
 			pascal_stop(&pascal);
 			bird_stop(&bird);
-			pan_stop(&pan);
+			//pan_stop(&pan);
 		}
 
         /* wait for vblank before scrolling */
