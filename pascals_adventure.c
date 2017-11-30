@@ -517,10 +517,10 @@ struct Thing {
     /* the animation counter counts how many frames until we flip */
     int counter;
 
-    /* whether the koopa is moving right now or not */
+    /* whether the pascal is moving right now or not */
     int move;
 
-    /* the number of pixels away from the edge of the screen the koopa stays */
+    /* the number of pixels away from the edge of the screen the pascal stays */
     int border;
 };
 
@@ -530,12 +530,27 @@ void pascal_init(struct Thing* pascal) {
 
 	pascal->x = 128;
 	pascal->y = 130;
-	pascal->border = 40;
+	pascal->border = 80;
 	pascal->frame = 16;
 	pascal->move = 0;
 	pascal->counter = 0;
 	pascal->animation_delay = 8;
 	pascal->sprite = sprite_init(pascal->x, pascal->y, SIZE_8_8, 0, 0, pascal->frame, 0);
+}
+
+int pascal_up(struct Thing* pascal) {
+    /* face up */
+    //sprite_set_vertical_flip(pascal->sprite, 0);
+    pascal->move = 1;
+
+    /* if we are at the top end, just scroll the screen */
+    if (pascal->y < (HEIGHT - pascal->border)) {
+        return 1;
+    } else {
+        /* else move up */
+        pascal->y--;
+        return 0;
+    }
 }
 
 /* stop */
@@ -550,20 +565,29 @@ void pascal_stop(struct Thing* pascal) {
 /* update the thing */
 void pascal_update(struct Thing* pascal) {
 
-	if(pascal->move) {
+	//Flip between frames 12 and 20 (frame 16 is stationary pascal)
+	if(pascal->move == 1) {
 
 		pascal->counter++;
 		if(pascal->counter >= pascal->animation_delay) {
 
-			pascal->frame = pascal->frame - 4;
-			if(pascal->frame < 12) {
+			if(pascal->frame == 12) {
 
-				pascal->frame = 16;
+				pascal->frame = 20;
+			}
+			else {
+
+				pascal->frame = 12;
 			}
 			sprite_set_offset(pascal->sprite, pascal->frame);
 			pascal->counter = 0;
 
 		}
+	}
+	else if(pascal->move == 2) {
+
+		pascal->frame = 28;
+		sprite_set_offset(pascal->sprite, pascal->frame);
 	}
 	sprite_position(pascal->sprite, pascal->x, pascal->y);
 }
@@ -698,16 +722,24 @@ int main() {
         if (button_pressed(BUTTON_DOWN)) {
             yscroll++;
         }
-        if (button_pressed(BUTTON_UP)) {
-            yscroll--;
+        else if (button_pressed(BUTTON_UP) && pascal.move != 2) {
+
+			if(pascal_up(&pascal)) {
+
+				yscroll--;
+			}
 
         }
-        if (button_pressed(BUTTON_RIGHT)) {
+        else if (button_pressed(BUTTON_RIGHT)) {
             //xscroll++;
         }
-        if (button_pressed(BUTTON_LEFT)) {
+        else if (button_pressed(BUTTON_LEFT)) {
             //xscroll--;
         }
+		else if (button_pressed(BUTTON_A)) {
+
+			pascal.move = 2;
+		}
 		else {
 
 			pascal_stop(&pascal);
