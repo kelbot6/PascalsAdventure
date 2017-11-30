@@ -594,15 +594,15 @@ void pascal_update(struct Thing* pascal) {
 
 /*****************************************************************************************/
 /* initialize Bird */
-void bird_init(struct Thing* bird) {
+void bird_init(struct Thing* bird, struct Thing* pascal) {
 
-    bird->x = 120;
-    bird->y = 60;
+    bird->x = 8;
+    bird->y = pascal->y;
     bird->border = 40;
     bird->frame = 14;
-    bird->move = 0;
+    bird->move = 1;
     bird->counter = 0;
-    bird->animation_delay = 16;
+    bird->animation_delay = 24;
     bird->sprite = sprite_init(bird->x, bird->y, SIZE_8_8, 0, 0, bird->frame, 0);
 }
 
@@ -616,18 +616,35 @@ void bird_stop(struct Thing* bird) {
 }
 
 /* update the thing */
-void bird_update(struct Thing* bird) {
+void bird_update(struct Thing* bird, struct Thing* pascal, int birdVelocity, int* birdCounter) {
+
+	int birdDelay = 9999999;
+	birdCounter++;
 
     if(bird->move) {
 
+		bird->y = pascal->y;
+
+		if(birdVelocity > 0 && *birdCounter >= birdDelay) {
+
+			bird->x+=1;
+			birdCounter = 0;
+		}
+		else if(birdVelocity < 0 && *birdCounter >= birdDelay) {
+
+			bird->x-=1;
+			birdCounter = 0;
+		}
+
+		//frames 14, 18, 22
         bird->counter++;
         if(bird->counter >= bird->animation_delay) {
 
-            //bird->frame = bird->frame - 4;
-            //if(bird->frame < 12) {
+            bird->frame = bird->frame + 4;
+            if(bird->frame > 22) {
 
-                //bird->frame = 0;
-            //}
+                bird->frame = 14;
+            }
             sprite_set_offset(bird->sprite, bird->frame);
             bird->counter = 0;
 
@@ -711,7 +728,10 @@ int main() {
 
 	/* create Bird */
 	struct Thing bird;
-	bird_init(&bird);
+	bird_init(&bird, &pascal);
+	//Give the bird an initial velocity and delay counter
+	int birdVelocity = 1;
+	int birdCounter = 0;
 
 	/* create Pan */
 	struct Thing pan;
@@ -724,9 +744,18 @@ int main() {
     /* loop forever */
     while (1) {
 
+		if(bird.x >= WIDTH) {
+
+			birdVelocity = -1;
+		}
+		else if(bird.x <= 0) {
+
+			birdVelocity = 1;
+		}
+
 		/* update pascal */
 		pascal_update(&pascal);
-		bird_update(&bird);
+		bird_update(&bird, &pascal, birdVelocity, &birdCounter);
 		pan_update(&pan, &pascal);
 
         /* scroll with the arrow keys */
@@ -754,7 +783,7 @@ int main() {
 		else {
 
 			pascal_stop(&pascal);
-			bird_stop(&bird);
+			//bird_stop(&bird);
 			//pan_stop(&pan);
 		}
 
