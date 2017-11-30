@@ -573,7 +573,7 @@ void pascal_update(struct Thing* pascal) {
 void bird_init(struct Thing* bird) {
 
     bird->x = 120;
-    bird->y = 90;
+    bird->y = 60;
     bird->border = 40;
     bird->frame = 14;
     bird->move = 0;
@@ -612,6 +612,50 @@ void bird_update(struct Thing* bird) {
     sprite_position(bird->sprite, bird->x, bird->y);
 }
 
+/*****************************************************************************************/
+/* initialize Pan */
+void pan_init(struct Thing* pan) {
+
+    pan->x = 128;
+    pan->y = 100;
+    pan->border = 40;
+    pan->frame = 24;
+    pan->move = 0;
+    pan->counter = 0;
+    pan->animation_delay = 8;
+    pan->sprite = sprite_init(pan->x, pan->y, SIZE_8_8, 0, 0, pan->frame, 0);
+}
+
+/* stop */
+void pan_stop(struct Thing* pan) {
+
+    pan->move = 0;
+    pan->frame = 24;
+    pan->counter = 7;
+    sprite_set_offset(pan->sprite, pan->frame);
+}
+
+/* update the thing */
+void pan_update(struct Thing* pan) {
+
+    if(pan->move) {
+
+        pan->counter++;
+        if(pan->counter >= pan->animation_delay) {
+
+            //pan->frame = pan->frame - 4;
+            //if(pan->frame < 12) {
+
+                //pan->frame = 0;
+            //}
+            sprite_set_offset(pan->sprite, pan->frame);
+            pan->counter = 0;
+
+        }
+    }
+    sprite_position(pan->sprite, pan->x, pan->y);
+}
+
 /* the main function */
 int main() {
     /* we set the mode to mode 0 with bg0 on */
@@ -634,6 +678,10 @@ int main() {
 	struct Thing bird;
 	bird_init(&bird);
 
+	/* create Pan */
+	struct Thing pan;
+	pan_init(&pan);
+
     /* set initial scroll to 0 */
     int xscroll = 0;
     int yscroll = 0;
@@ -644,6 +692,7 @@ int main() {
 		/* update pascal */
 		pascal_update(&pascal);
 		bird_update(&bird);
+		pan_update(&pan);
 
         /* scroll with the arrow keys */
         if (button_pressed(BUTTON_DOWN)) {
@@ -663,6 +712,7 @@ int main() {
 
 			pascal_stop(&pascal);
 			bird_stop(&bird);
+			pan_stop(&pan);
 		}
 
         /* wait for vblank before scrolling */
