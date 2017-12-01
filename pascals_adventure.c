@@ -786,7 +786,8 @@ void pan_update(struct Thing* pan, struct Thing* pascal) {
 }
 
 /* import our assembly functions to help with collision checking */
-int pan_collide(float pan_y, float pascal_y);
+int pan_collide(int pan_y, int pascal_y);
+int bird_collide_right(int bird_velocity, int pascal_x, int bird_x);
 
 /* Check for collision */
 int collision(struct Thing* pascal, struct Thing* pan, struct Thing* bird, int birdVelocity) {
@@ -794,16 +795,20 @@ int collision(struct Thing* pascal, struct Thing* pan, struct Thing* bird, int b
 	if(pascal->move != 2) {
 
 		/* did pascal and pan collide */
-		if(pan->y + 8 > pascal->y && pan->y + 8 <  pascal->y + 8) {
-
-			return 1;
-		}
-		/*if(pan_collide(pan->y, pascal->y) == 1) {
+		/*if(pan->y + 8 > pascal->y && pan->y + 8 <  pascal->y + 8) {
 
 			return 1;
 		}*/
+		if(pan_collide((int) pan->y, (int)  pascal->y) == 1) {
+
+			return 1;
+		}
 		/* did pascal and pan collide */
-		else if(birdVelocity > 0 && pascal->x == bird->x + 8) {
+		/*else if(birdVelocity > 0 && pascal->x == bird->x + 8) {
+
+			return 1;
+		}*/
+		else if(bird_collide_right(birdVelocity, (int) pascal->x, (int) bird->x) == 1) {
 
 			return 1;
 		}
