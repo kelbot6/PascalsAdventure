@@ -383,9 +383,9 @@ void display_text() {
 }
 
 /* just kill time */
-void delay(unsigned int amount) {
+void delay(unsigned int amount); /*{
     for (int i = 0; i < amount * 10; i++);
-}
+}*/
 
 /* a sprite is a moveable image on the screen */
 struct Sprite {
@@ -785,6 +785,9 @@ void pan_update(struct Thing* pan, struct Thing* pascal) {
     sprite_position(pan->sprite, pan->x, pan->y);
 }
 
+/* import our assembly functions to help with collision checking */
+int pan_collide(float pan_y, float pascal_y);
+
 /* Check for collision */
 int collision(struct Thing* pascal, struct Thing* pan, struct Thing* bird, int birdVelocity) {
 
@@ -795,6 +798,10 @@ int collision(struct Thing* pascal, struct Thing* pan, struct Thing* bird, int b
 
 			return 1;
 		}
+		/*if(pan_collide(pan->y, pascal->y) == 1) {
+
+			return 1;
+		}*/
 		/* did pascal and pan collide */
 		else if(birdVelocity > 0 && pascal->x == bird->x + 8) {
 
