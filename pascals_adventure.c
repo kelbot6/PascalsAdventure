@@ -6,12 +6,14 @@
 /* include the image palettes we are using */
 #include "tower_tiles.h"
 #include "sprite_sheet.h"
+#include "letter_tiles.h"
 
 /* include the tile maps we are using */
 #include "background1.h"
 #include "background2.h"
 #include "background3.h"
 #include "background4.h"
+#include "background_text.h"
 
 /* the width and height of the screen */
 #define WIDTH 240
@@ -326,6 +328,56 @@ void setup_background() {
     for (int i = 0; i < 32; i++) {
         for (int j = 0; j < 32; j++) {
             dest[i*32 + j] = background4[i*64+32 + j + 2048];
+        }
+    }
+}
+
+/* display either the rules, losing, or winning screen */
+void display_text() {
+	/* load the palette from the image into palette memory */
+	for (int i = 0; i < PALETTE_SIZE; i++){	
+		bg_palette[i] = letter_tiles_palette[i];
+	}
+	//******************************************************
+	/* load the image into char block 0 (16 bits at a time) */
+	volatile unsigned short* dest = char_block(0);
+	unsigned short* image = (unsigned short*) letter_tiles_data;
+	for (int i = 0; i < ((letter_tiles_width * letter_tiles_height) / 2); i++){
+		dest[i] = image[i];
+	}
+	
+	/* set all control the bits in this register */
+    *bg0_control = 0 |    /* priority, 0 is highest, 3 is lowest */
+        (0 << 2)  |       /* the char block the image data is stored in */
+        (0 << 6)  |       /* the mosaic flag */
+        (1 << 7)  |       /* color mode, 0 is 16 colors, 1 is 256 colors */
+        (28 << 8) |       /* the screen block the tile data is stored in */
+        (0 << 13) |       /* wrapping flag */
+        (3 << 14);        /* bg size, 0 is 256x256 */
+
+	/* load the tile data into screen block 16 through 19 */
+    dest = screen_block(28);
+    for (int i = 0; i < 32; i++) {
+        for (int j = 0; j < 32; j++) {
+            dest[i*32 + j] = background_text[i*64 + j];
+        }
+    }   
+    dest = screen_block(29);
+    for (int i = 0; i < 32; i++) {
+        for (int j = 0; j < 32; j++) {
+            dest[i*32 + j] = background_text[i*64+32 + j];
+        }
+    }   
+    dest = screen_block(30); 
+    for (int i = 0; i < 32; i++) {
+        for (int j = 0; j < 32; j++) {
+            dest[i*32 + j] = background_text[i*64 + j + 2048];
+        }
+    }
+    dest = screen_block(31); 
+    for (int i = 0; i < 32; i++) {
+        for (int j = 0; j < 32; j++) {
+            dest[i*32 + j] = background_text[i*64+32 + j + 2048];
         }
     }
 }
@@ -794,12 +846,20 @@ int main() {
     while (1) {
 
 		if(yscroll <= -300) {
-
+			wait_vblank();
+			// display winning screen
+			display_text();
+			*bg0_y_scroll = yscroll;
+			delay(1000);
 			break;
 		}
 
 		if(collision(&pascal, &pan, &bird, birdVelocity) == 1) {
-
+			wait_vblank();
+			// display losing screen
+			display_text();
+			*bg0_y_scroll = 400 + yscroll;
+			delay(1000);
 			break;
 		}
 
