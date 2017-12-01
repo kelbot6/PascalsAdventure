@@ -841,6 +841,7 @@ int main() {
     /* set initial scroll to 0 */
     int xscroll = 0;
     int yscroll = 0;
+	int yscroll_text = 0;
 
     /* loop forever */
     while (1) {
@@ -849,8 +850,8 @@ int main() {
 			wait_vblank();
 			// display winning screen
 			display_text();
-			*bg0_y_scroll = yscroll;
-			delay(1000);
+			*bg0_y_scroll = yscroll_text;
+			delay(100500);
 			break;
 		}
 
@@ -858,8 +859,8 @@ int main() {
 			wait_vblank();
 			// display losing screen
 			display_text();
-			*bg0_y_scroll = 400 + yscroll;
-			delay(1000);
+			*bg0_y_scroll = 350 + yscroll_text;
+			delay(100500);
 			break;
 		}
 
