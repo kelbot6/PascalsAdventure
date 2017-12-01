@@ -855,6 +855,12 @@ int main() {
     int yscroll = 0;
 	int yscroll_text = 0;
 
+	display_text();
+	*bg0_y_scroll = 165 + yscroll_text;
+	delay(300500);
+
+	setup_background();
+
     /* loop forever */
     while (1) {
 
